@@ -1,0 +1,42 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Hello World App
+Globals:
+  Function:
+    Timeout: 3
+    MemorySize: 128
+    Environment:
+      Variables:
+        TableName:
+          Ref: Table
+        RegionName:
+          Ref: AWS::Region
+Resources:
+  HelloWorldFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: HelloWorldFunction
+      Handler: app.lambdaHandler
+      Runtime: nodejs16.x
+      Events:
+        ChrisKaySam:
+          Type: Api
+          Properties:
+            Path: /hello
+            Method: get
+      Policies:
+      - DynamoDBCrudPolicy:
+          TableName:
+            Ref: Table
+      - CloudWatchPutMetricPolicy: {}
+    Metadata:
+      SamResourceId: HelloWorldFunction
+  Table:
+    Type: AWS::Serverless::SimpleTable
+    Properties:
+      ProvisionedThroughput:
+        ReadCapacityUnits: 1
+        WriteCapacityUnits: 1
+      PrimaryKey:
+        Name: greeting
+        Type: String
